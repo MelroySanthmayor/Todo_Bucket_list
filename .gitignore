@@ -1,4 +1,4 @@
-/.idea                  #ignoring these files that contain mostly libraries
+.idea/**                  #ignoring these files that contain mostly libraries
 /node_modules
 /venv
 /package-lock.json
