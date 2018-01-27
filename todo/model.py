@@ -1,20 +1,26 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from todo.database import Base
 
-class Entry(Base):
-    __tablename__ = "entries"
+class Todo (Base):
+    __tablename__ = "todos"
     id = Column(Integer, primary_key=True)
     title = Column(String)
-    order = Column(Integer)
+    priority = Column(Integer)
     completed = Column(Boolean)
 
-    def __init__(self, title=None, order=None):
+    def __init__(self, title=None, priority=None):
         self.title = title
-        self.order = order
+        self.priority = priority
         self.completed = False
 
-    def __repr__(self):
-        return "<Entry: {}>".format(self.title)
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'priority':self.priority,
+            'completed': self.completed,
+
+        }
 
 
 
