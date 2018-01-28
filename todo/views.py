@@ -2,12 +2,58 @@ from todo import app
 
 from flask import jsonify, request, url_for
 from flask import json
-
-from todo.database import db_session
-from todo.model import Entry
+from flask import render_template
+from todo.database import db_session,init_db
+from todo.model import Todo
 from todo.error_handlers import InvalidUsage
 
-@app.route("/", methods=["GET", "POST", "DELETE"])
+@app.route('/bucket_list')
+def sqlalchemy():
+    todos = []
+    try:
+        todos = Todo.query.order_by(Todo.priority).all()
+    except:
+        init_db()
+    print(todos)
+    return render_template('index.html', todos=todos)
+
+
+@app.route('/bucket_list/get', methods=['GET'])
+def sqlalchemy_get():
+    todos = Todo.query.order_by(Todo.priority).all()
+    return jsonify(todos=[todo.get_dict() for todo in todos])
+
+
+@app.route('/bucket_list/new', methods=["POST"])
+def sqlalchemy_new():
+    if request.method =="POST":
+        request_json = request.get_json()
+        db_session.add(Todo(request_json['title'],Todo(request_json['priority'])))
+        db_session.commit()
+    return jsonify(status='ok')   # Always ok!
+
+
+@app.route('/bucket_list/update', methods=["PATCH"])
+def sqlalchemy_update():
+    if request.method == "PATCH":
+        request_json = request.get_json()
+        todo = Todo.query.get(request_json['id'])
+        todo.completed = request_json['completed']
+        todo.title = request_json['title']
+        todo.priority = request_json['priority']
+        db_session.commit()
+    return jsonify(status='ok')   # Always ok!
+
+@app.route('/bucket_list/delete', methods=["DELETE"])
+def sqlalchemy_update():
+    if request.method == "DELETE":
+        request_json = request.get_json()
+        todo = Todo.query.get(request_json['id'])
+        db_session.delete(todo)
+        db_session.commit()
+    return jsonify(status='ok')   # Always ok!
+
+'''@app.route("/", methods=["GET", "POST", "DELETE"])
 def index():
     if request.method == "POST":
         request_json = request.get_json()
@@ -29,6 +75,7 @@ def index():
         for entry in Entry.query.all():
             response.append(construct_dict(entry))
         return json.dumps(response)
+
 
 @app.route("/<int:entry_id>", methods=["GET", "PATCH", "DELETE"])
 def entry(entry_id):
@@ -56,23 +103,16 @@ def entry(entry_id):
         return jsonify(construct_dict(entry))
     else:
         return jsonify(dict())
-
+'''
 @app.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
 
-def construct_dict(entry):
-    if entry.order:
-        return dict(title=entry.title, completed=entry.completed,
-            url=url_for("entry", entry_id=entry.id, _external=True),
-            order=entry.order)
-    else:
-        return dict(title=entry.title, completed=entry.completed,
-            url=url_for("entry", entry_id=entry.id, _external=True))
+
 
 
 @app.teardown_appcontext
-def shutdown_session(exception=None):
+def shutdown_session(exception = None):
     db_session.remove()
