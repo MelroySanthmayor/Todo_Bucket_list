@@ -24,22 +24,24 @@
 
 		// the root element that will be compiled
 		el: '.todoapp',
-        delimiters: ["[[", "]]"],
+		delimiters: ["[[", "]]"],  //using deleimters to differntiate jinja {{}}
+		
 		// app initial state
 		data: {
 			todos:[],
 			newTodo: '',
+			prty:'',
 			editedTodo: null,
 			visibility: 'all'
 		},
 
-		// watch todos change for localStorage persistence
+		/* watch todos change for localStorage persistence
 		watch: {
 			todos: {
 				deep: true,
 				handler: todoStorage.save
 			}
-		},
+		},   */
 
 		// computed properties
 		// http://vuejs.org/guide/computed.html
@@ -76,9 +78,27 @@
 					return;
 				}
 				this.todos.push({ id: this.todos.length + 1, title: value, completed: false });
+				this.newTodo()
 				this.newTodo = '';
 			},
-
+			updateTodoList: function() {
+				axios.get('/bucket_list/get')
+				  .then(function(response) {
+					this.todos = response.data.todos
+				  }.bind(this))
+			},
+			updateTodo: function(index) {
+				axios.post('/bucket_list/update', this.todos[index])
+				  .then(function(response) {
+					this.updateTodoList()
+				  }.bind(this))
+			},
+            newTodo: function() {
+				axios.post('/bucket_list/new', { title: this.newTodo,priority: this.prty })
+				  .then(function(response) {
+					this.updateTodoList()
+				  }.bind(this))
+			},	  
 			removeTodo: function (todo) {
 				var index = this.todos.indexOf(todo);
 				this.todos.splice(index, 1);
