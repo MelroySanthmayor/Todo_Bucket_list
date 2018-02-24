@@ -30,19 +30,19 @@
         },
         methods: {
           updateTodoList: function() {
-            axios.get('/sqlalchemy/get')
+            axios.get('/bucket_list/get')
               .then(function(response) {
                 this.todos = response.data.todos
               }.bind(this))
           },
           newTodo: function() {
-            axios.post('/sqlalchemy/new', { title: this.newTitle })
+            axios.post('/bucket_list/new', { title: this.newTitle })
               .then(function(response) {
                 this.updateTodoList()
               }.bind(this))
           },
           updateTodo: function(index) {
-            axios.post('/sqlalchemy/update', this.todos[index])
+            axios.post('/bucket_list/update', this.todos[index])
               .then(function(response) {
                 this.updateTodoList()
               }.bind(this))
@@ -69,11 +69,12 @@ type="text" maxlength="1" min='1' max='5'v-model="prty"    >
         return
       }
       this.todos.push({
-        id: todoStorage.uid++,
+        id: this.todos.length + 1,
         title: value,
         priority:value2,
         completed: false
       })
+      this.newTodo()
       this.newTodo = ''
       this.prty=''
       
