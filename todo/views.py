@@ -32,6 +32,16 @@ def sqlalchemy_new():
         db_session.commit()
     return jsonify(status='ok')   # Always ok!
 
+@app.route('/bucket_list/toggle_completed',methods=["PATCH"])
+def sqlalchemy_update_completed():
+    if request.method =="POST":
+        request_json = request.get_json()
+        todos = Todo.query.get(request_json['id']).all()
+        for todo in todos:
+            todo.completed = request_json['completed']
+    return jsonify(status='ok')
+
+
 
 @app.route('/bucket_list/update', methods=["PATCH"])
 def sqlalchemy_update():
