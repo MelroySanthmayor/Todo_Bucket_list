@@ -81,27 +81,38 @@
 				this.newTodo()
 				this.newTodo = '';
 			},
-			updateTodoList: function() {
+			getTodoList: function() {
 				axios.get('/bucket_list/get')
 				  .then(function(response) {
 					this.todos = response.data.todos
 				  }.bind(this))
 			},
-			updateTodo: function(index) {
+			updateTodo: function(todo) {
+				var index = this.todos.indexOf(todo);
 				axios.post('/bucket_list/update', this.todos[index])
 				  .then(function(response) {
-					this.updateTodoList()
+					this.getTodoList()
 				  }.bind(this))
 			},
             newTodo: function() {
 				axios.post('/bucket_list/new', { title: this.newTodo,priority: this.prty })
 				  .then(function(response) {
-					this.updateTodoList()
+					this.getTodoList()
+				  }.bind(this))
+			},
+			toggle_all: function() {
+				axios.post('/bucket_list/toggle_completed', this.todos[])
+				  .then(function(response) {
+					this.getTodoList()
 				  }.bind(this))
 			},	  
 			removeTodo: function (todo) {
 				var index = this.todos.indexOf(todo);
 				this.todos.splice(index, 1);
+				axios.post('/bucket_list/delete', this.todos[index])
+				  .then(function(response) {
+					  this.getTodoList()
+                   }.bind(this))
 			},
 
 			editTodo: function (todo) {
@@ -115,6 +126,7 @@
 				}
 				this.editedTodo = null;
 				todo.title = todo.title.trim();
+                this.updateTodo()
 				if (!todo.title) {
 					this.removeTodo(todo);
 				}
