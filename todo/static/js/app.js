@@ -73,13 +73,20 @@
 			},
 
 			addTodo: function () {
-				var value = this.newTodo && this.newTodo.trim();
-				if (!value) {
-					return;
+				var value = this.newTodo && this.newTodo.trim()
+				var value2=this.prty && this.prty.trim()
+				if (!value && !value2) {
+				  return
 				}
-				this.todos.push({ id: this.todos.length + 1, title: value, completed: false });
+				this.todos.push({
+				  id: this.todos.length + 1,
+				  title: value,
+				  priority:value2,
+				  completed: false
+				})
 				this.newTodo()
-				this.newTodo = '';
+				this.newTodo = ''
+				this.prty=''
 			},
 			getTodoList: function() {
 				axios.get('/bucket_list/get')
@@ -89,7 +96,7 @@
 			},
 			updateTodo: function(todo) {
 				var index = this.todos.indexOf(todo);
-				axios.post('/bucket_list/update', this.todos[index])
+				axios.patch('/bucket_list/update', this.todos[index])
 				  .then(function(response) {
 					this.getTodoList()
 				  }.bind(this))
@@ -101,7 +108,7 @@
 				  }.bind(this))
 			},
 			toggle_all: function() {
-				axios.post('/bucket_list/toggle_completed', this.todos[])
+				axios.patch('/bucket_list/toggle_completed', this.todos[])
 				  .then(function(response) {
 					this.getTodoList()
 				  }.bind(this))
@@ -109,7 +116,7 @@
 			removeTodo: function (todo) {
 				var index = this.todos.indexOf(todo);
 				this.todos.splice(index, 1);
-				axios.post('/bucket_list/delete', this.todos[index])
+				axios.delete('/bucket_list/delete', this.todos[index])
 				  .then(function(response) {
 					  this.getTodoList()
                    }.bind(this))
@@ -138,7 +145,12 @@
 			},
 
 			removeCompleted: function () {
-				this.todos = filters.active(this.todos);
+				axios.delete('/bucket_list/cmpltd_delete', this.todos)
+				.then(function(response) {
+					this.todos = filters.active(this.todos);
+				 }.bind(this))
+		  
+				
 			}
 		},
 
