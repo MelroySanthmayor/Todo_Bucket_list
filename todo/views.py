@@ -28,17 +28,18 @@ def sqlalchemy_get():
 def sqlalchemy_new():
     if request.method =="POST":
         request_json = request.get_json()
-        db_session.add(Todo(request_json['title'],Todo(request_json['priority'])))
+        db_session.add(Todo(request_json['title'], Todo(request_json['priority'])))
         db_session.commit()
     return jsonify(status='ok')   # Always ok!
 
 @app.route('/bucket_list/toggle_completed',methods=["PATCH"])
 def sqlalchemy_update_completed():
-    if request.method =="POST":
+    if request.method =="PATCH":
         request_json = request.get_json()
         todos = Todo.query.get(request_json['id']).all()
         for todo in todos:
             todo.completed = request_json['completed']
+        db_session.commit()
     return jsonify(status='ok')
 
 
@@ -60,6 +61,17 @@ def sqlalchemy_update():
         request_json = request.get_json()
         todo = Todo.query.get(request_json['id'])
         db_session.delete(todo)
+        db_session.commit()
+    return jsonify(status='ok')   # Always ok!
+
+@app.route('/bucket_list/cmpltd_delete', methods=["DELETE"])
+def sqlalchemy_update():
+    if request.method == "DELETE":
+        request_json = request.get_json()
+        todos = Todo.query.get(request_json['id']).all()
+        for todo in todos:
+            if todo.completed==True:
+                db_session.delete(todo)
         db_session.commit()
     return jsonify(status='ok')   # Always ok!
 
