@@ -11,14 +11,20 @@
 		<section class="todoapp" v-cloak>
 			<header class="header">
 				<h1>todos</h1>
-				<input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?" v-model="newTodo" @keyup.enter="addTodo">
+				<input class="new-todo" autofocus autocomplete="off" placeholder="What needs to be done?" v-model="newTodo">
+				<label>Priority:</label>
+                <input class="newpriority" autofocus autocomplete="off" placeholder="get ur priorites straight" v-bind:title="message"
+                   type="text" maxlength="1" min='1' max='5'v-model="prty">
+                <button @click="addTodo">
+						Add Task
+				</button>
 			</header>
 			<section class="main" v-show="todos.length">
 				<input class="toggle-all" type="checkbox" v-model="allDone">
 				<ul class="todo-list">
 					<li class="todo" v-for="todo in filteredTodos" :key="todo.id" :class="{completed: todo.completed, editing: todo == editedTodo}">
 						<div class="view">
-							<input class="toggle" type="checkbox" v-model="todo.completed">
+							<input class="toggle" type="checkbox" v-model="todo.completed"@click="toggle_all">
 							<label @dblclick="editTodo(todo)">{{todo.title}}</label>
 							<button class="destroy" @click="removeTodo(todo)"></button>
 						</div>
