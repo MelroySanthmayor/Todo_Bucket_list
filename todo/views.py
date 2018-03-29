@@ -3,7 +3,7 @@ from todo import app
 from flask import jsonify, request, url_for
 from flask import json
 from flask import render_template
-from todo.database import db_session,init_db
+from todo.database import db_session, init_db
 from todo.model import Todo
 from todo.error_handlers import InvalidUsage
 
