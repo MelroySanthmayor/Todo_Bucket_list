@@ -19,7 +19,31 @@
 			});
 		}
 	};
-
+    exports.image_handler = new Vue({
+		el: 'imageslider',
+		data:{
+			images: ['https://i.pinimg.com/564x/c7/2d/f7/c72df7061c9c7bb54ea537a05bcd553b.jpg'],
+			currentNumber: 0,
+			timer: null
+		},
+		ready: function () {
+			this.startRotation();
+		},
+		methods: {
+			startRotation: function() {
+				this.timer = setInterval(this.next, 3000);
+			},
+	
+			stopRotation: function() {
+				clearTimeout(this.timer);
+				this.timer = null;
+			},
+	
+			next: function() {
+				this.currentNumber += 1
+			}
+		}
+	});
 	exports.app = new Vue({
 
 		// the root element that will be compiled
@@ -32,6 +56,7 @@
 			newTodo: '',
 			prty:'',
 			editedTodo: null,
+			attempt_addtask: false,
 			visibility: 'all'
 		},
 
@@ -52,6 +77,14 @@
 			remaining: function () {
 				return filters.active(this.todos).length;
 			},
+			missingInput: function () { return this.name === ''; },
+			wrongNumber: function () {
+				return (
+				  this.isNumeric(this.number) === false ||
+				  this.number < 1 ||
+				  this.number > 5
+				)
+			  },
 			allDone: {
 				get: function () {
 					return this.remaining === 0;
@@ -71,8 +104,15 @@
 			pluralize: function (word, count) {
 				return word + (count === 1 ? '' : 's');
 			},
+			isNumeric: function (n) {
+				return !isNaN(parseFloat(n)) && isFinite(n);
+			},
 
-			addTodo: function () {
+			addTodo: function (event) {
+				this.attempt_addtask=true;
+				if (this.missingInput || this.wrongNumber)
+                    event.preventDefault();
+					
 				var value = this.newTodo && this.newTodo.trim()
 				var value2=this.prty && this.prty.trim()
 				if (!value && !value2) {
